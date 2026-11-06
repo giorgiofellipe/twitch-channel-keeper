@@ -4,9 +4,7 @@ A tiny local browser extension (Chrome / Edge / Brave) that keeps **one** Twitch
 parked on the first **live** channel in your list. When that channel goes offline, it
 jumps to the next live channel — circular, following your list's priority order.
 
-**➡ Install guide (EN / PT-BR): https://giorgiofellipe.com.br/twitch-channel-keeper/**
-(the `giorgiofellipe.github.io/twitch-channel-keeper/` URL auto-redirects here, because the
-account's user Pages site uses the `giorgiofellipe.com.br` custom domain.)
+**➡ Install guide (EN / PT-BR): https://giorgiofellipe.github.io/twitch-channel-keeper/**
 
 ## Features
 - Keeps a single dedicated Twitch tab on a live channel from your list.
