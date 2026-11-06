@@ -145,9 +145,7 @@
   var LANG = "en", BROWSER = "chrome";
 
   function repoLink(){
-    var m = location.hostname.match(/^([^.]+)\.github\.io$/);
-    var parts = location.pathname.split("/").filter(Boolean);
-    return (m && parts.length) ? "https://github.com/"+m[1]+"/"+parts[0] : "https://github.com/";
+    return "https://github.com/giorgiofellipe/twitch-channel-keeper";
   }
 
   function render(){
