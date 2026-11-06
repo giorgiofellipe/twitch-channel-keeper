@@ -13,6 +13,8 @@ jumps to the next live channel — circular, following your list's priority orde
 - Opens the tab **focused with sound** (a background tab won't autostart playback).
 - Option: **close other Twitch tabs**.
 - Option: **open the tab muted** (mutes the browser tab, never the Twitch player).
+- **Player-health watcher**: detects a crashed / stalled / paused player, tries to resume,
+  reloads the tab, and skips to the next live channel if reloads don't help.
 - UI in **English** and **Português (BR)**.
 - Live check via Twitch's public web API — read-only, no login, no API key.
 

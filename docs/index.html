@@ -113,8 +113,8 @@
       ]; },
       braveNote: '<b>Brave tip:</b> Brave has no store of its own — it installs Chromium extensions exactly like this. If you see a one-time "keep developer-mode extensions" prompt, choose <b>Keep</b>.',
       updatesNote: '<b>Audio & focus:</b> by default the stream plays <b>with sound</b>, and the tab opens <b>focused</b> (a background tab won\'t autostart playback). The optional "muted" setting mutes the <em>browser tab</em>, never the Twitch player.<br><br><b>Updates are manual:</b> re-download, replace the folder contents, then click ↻ reload on the extension card.',
-      liveTitle: "How it decides who's live",
-      liveBody: "It reads Twitch's public web API (the same one logged-out visitors use) — read-only, no login, no API key, no personal data collected. Your channel list is stored locally. It checks about once a minute (and instantly when you toggle it on).",
+      liveTitle: "How it decides who's live (and keeps it playing)",
+      liveBody: "It reads Twitch's public web API (the same one logged-out visitors use) — read-only, no login, no API key, no personal data collected. Your channel list is stored locally. It checks about once a minute (and instantly when you toggle it on). It also watches the player itself: if the stream crashes, stalls, or gets paused, it tries to resume, then reloads the tab, and moves to the next live channel if that fails.",
       footer: "Not affiliated with Twitch. Personal-use helper."
     },
     pt: {
@@ -136,8 +136,8 @@
       ]; },
       braveNote: '<b>Dica Brave:</b> o Brave não tem loja própria — ele instala extensões Chromium exatamente assim. Se aparecer um aviso para "manter extensões do modo desenvolvedor", escolha <b>Manter</b>.',
       updatesNote: '<b>Áudio e foco:</b> por padrão a transmissão toca <b>com som</b> e a aba abre <b>em foco</b> (uma aba em segundo plano não inicia a reprodução). A opção "muda" silencia a <em>aba do navegador</em>, nunca o player da Twitch.<br><br><b>Atualizações são manuais:</b> baixe de novo, substitua o conteúdo da pasta e clique em ↻ recarregar no card da extensão.',
-      liveTitle: "Como ele sabe quem está ao vivo",
-      liveBody: "Ele lê a API pública da web da Twitch (a mesma que visitantes deslogados usam) — somente leitura, sem login, sem chave de API, sem coletar dados pessoais. Sua lista fica salva localmente. Verifica cerca de uma vez por minuto (e na hora quando você liga).",
+      liveTitle: "Como ele sabe quem está ao vivo (e mantém tocando)",
+      liveBody: "Ele lê a API pública da web da Twitch (a mesma que visitantes deslogados usam) — somente leitura, sem login, sem chave de API, sem coletar dados pessoais. Sua lista fica salva localmente. Verifica cerca de uma vez por minuto (e na hora quando você liga). Ele também monitora o próprio player: se a transmissão travar, parar ou for pausada, ele tenta retomar, recarrega a aba e, se preciso, passa para o próximo canal ao vivo.",
       footer: "Sem afiliação com a Twitch. Utilitário de uso pessoal."
     }
   };

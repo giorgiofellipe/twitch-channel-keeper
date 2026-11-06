@@ -21,7 +21,9 @@ const DEFAULTS = {
   muteTab: false      // if true, mute the browser TAB (not the Twitch player). Default: volume on.
 };
 
-let running = false;   // simple mutex so alarm + storage-change don't overlap
+let running = false;      // simple mutex so alarm + storage-change don't overlap
+let deadStrikes = 0;      // consecutive "player dead" reports for the managed tab
+let lastDeadAction = 0;   // ms timestamp of last recovery action (debounce reloads)
 
 // ---------- storage helpers ----------
 async function getState() {
@@ -95,6 +97,7 @@ async function focusTab(tabId, windowId) {
 }
 
 async function openOrNavigate(login) {
+  deadStrikes = 0; // fresh channel/navigation -> reset the dead-player counter
   const url = `https://www.twitch.tv/${login}`;
   const { muteTab } = await getState();
   const tab = await getManagedTab();
@@ -108,6 +111,42 @@ async function openOrNavigate(login) {
   await setState({ managedTabId: created.id });
   await focusTab(created.id, created.windowId);
   return created.id;
+}
+
+// Forced skip: scan from AFTER the current channel for the next live one.
+async function advanceToNextLive() {
+  const state = await getState();
+  if (!state.enabled) return;
+  const channels = (state.channels || []).map(sanitizeLogin).filter(Boolean);
+  if (channels.length === 0) { setBadge("!", "#cc3333"); return; }
+  const start = ((state.currentIndex || 0) + 1) % channels.length;
+  for (let k = 0; k < channels.length; k++) {
+    const idx = (start + k) % channels.length;
+    if (await isLive(channels[idx])) {
+      const id = await openOrNavigate(channels[idx]);
+      await setState({ currentIndex: idx });
+      if (state.closeOthers) await closeOtherTwitchTabs(id);
+      setBadge("live", "#3fb950");
+      return;
+    }
+  }
+  setBadge("0", "#d29922");
+}
+
+// Recovery ladder when the watcher reports a dead/stalled player.
+async function onPlayerDead(tabId) {
+  const state = await getState();
+  if (!state.enabled || tabId !== state.managedTabId) return;
+  const now = Date.now();
+  if (now - lastDeadAction < 8000) return; // a reload is probably still in progress
+  lastDeadAction = now;
+  deadStrikes++;
+  if (deadStrikes <= 2) {
+    try { await chrome.tabs.reload(tabId); } catch (e) { console.warn("reload failed", e); }
+  } else {
+    deadStrikes = 0;
+    await advanceToNextLive(); // two reloads didn't help -> move to the next live channel
+  }
 }
 
 async function closeOtherTwitchTabs(keepId) {
@@ -220,10 +259,30 @@ chrome.tabs.onRemoved.addListener(async (tabId) => {
   if (tabId === managedTabId) await setState({ managedTabId: null });
 });
 
-// Popup "Check now" button.
+// Messages from the popup and the content-script watcher.
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg && msg.type === "runNow") {
+  if (!msg) return;
+
+  if (msg.type === "runNow") {
     manage().then(() => sendResponse({ ok: true }));
     return true; // async response
+  }
+
+  if (msg.type === "amIManaged") {
+    getState().then((s) => {
+      const active = !!(s.enabled && sender.tab && sender.tab.id === s.managedTabId);
+      sendResponse({ active });
+    });
+    return true;
+  }
+
+  if (msg.type === "playerOk") {
+    if (sender.tab) getState().then((s) => { if (sender.tab.id === s.managedTabId) deadStrikes = 0; });
+    return;
+  }
+
+  if (msg.type === "playerDead") {
+    if (sender.tab) onPlayerDead(sender.tab.id);
+    return;
   }
 });
