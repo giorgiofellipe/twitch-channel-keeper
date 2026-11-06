@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<style>
+  :root { color-scheme: dark; }
+  body {
+    width: 310px; margin: 0; padding: 14px;
+    font: 13px/1.4 "Segoe UI", system-ui, sans-serif;
+    background: #18181b; color: #efeff1;
+  }
+  h1 { font-size: 14px; margin: 0 0 10px; display: flex; align-items: center; gap: 8px; }
+  h1 .dot { width: 9px; height: 9px; border-radius: 50%; background: #777; }
+  h1 .dot.on { background: #3fb950; }
+  h1 .spacer { flex: 1; }
+  #lang { background:#0e0e10; color:#efeff1; border:1px solid #333; border-radius:6px; font-size:11px; padding:2px 4px; }
+
+  .row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 11px; gap: 10px; }
+  label.ttl { font-weight: 600; }
+
+  .switch { position: relative; display: inline-block; width: 46px; height: 24px; flex: none; }
+  .switch input { display: none; }
+  .slider { position: absolute; inset: 0; background: #3a3a3d; border-radius: 24px; transition: .2s; cursor: pointer; }
+  .slider:before { content: ""; position: absolute; width: 18px; height: 18px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: .2s; }
+  input:checked + .slider { background: #9147ff; }
+  input:checked + .slider:before { transform: translateX(22px); }
+
+  .chk { display: flex; align-items: center; gap: 8px; margin-bottom: 11px; }
+  .chk input { width: 15px; height: 15px; accent-color: #9147ff; }
+
+  textarea {
+    width: 100%; box-sizing: border-box; height: 128px; resize: vertical;
+    background: #0e0e10; color: #efeff1; border: 1px solid #333; border-radius: 6px;
+    padding: 8px; font: 12px/1.4 Consolas, monospace;
+  }
+  .hint { color: #adadb8; font-size: 11px; margin: 4px 0 10px; }
+  .btns { display: flex; gap: 8px; }
+  button {
+    flex: 1; padding: 7px 0; border: 0; border-radius: 6px; cursor: pointer;
+    background: #9147ff; color: #fff; font-weight: 600;
+  }
+  button.secondary { background: #3a3a3d; }
+  #status { margin-top: 10px; font-size: 12px; color: #adadb8; min-height: 16px; }
+  #status b { color: #efeff1; }
+</style>
+</head>
+<body>
+  <h1>
+    <span id="dot" class="dot"></span>
+    <span>Twitch Channel Keeper</span>
+    <span class="spacer"></span>
+    <select id="lang" title="Language">
+      <option value="en">EN</option>
+      <option value="pt">PT-BR</option>
+    </select>
+  </h1>
+
+  <div class="row">
+    <label class="ttl" id="l_keep" for="enabled">Keep a live channel open</label>
+    <label class="switch">
+      <input type="checkbox" id="enabled" />
+      <span class="slider"></span>
+    </label>
+  </div>
+
+  <div class="chk">
+    <input type="checkbox" id="closeOthers" />
+    <label id="l_close" for="closeOthers">Close other Twitch tabs</label>
+  </div>
+
+  <div class="chk">
+    <input type="checkbox" id="muteTab" />
+    <label id="l_mute" for="muteTab">Open tab muted (the browser tab, not the Twitch player)</label>
+  </div>
+
+  <div class="hint" id="l_hint">One channel per line, in priority order (top = highest). "@" is optional.</div>
+  <textarea id="channels" spellcheck="false" placeholder="rubini&#10;kekedepatinete&#10;..."></textarea>
+
+  <div class="btns">
+    <button id="save">Save list</button>
+    <button id="checkNow" class="secondary">Check now</button>
+  </div>
+
+  <div id="status"></div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

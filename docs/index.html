@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Twitch Channel Keeper — Install Guide</title>
+<style>
+  :root{
+    --bg:#0e0e10; --panel:#18181b; --panel2:#1f1f23; --line:#2a2a2e;
+    --txt:#efeff1; --mut:#adadb8; --purple:#9147ff; --green:#3fb950;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);
+       font:15px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif}
+  a{color:var(--purple)}
+  .wrap{max-width:820px;margin:0 auto;padding:22px 20px 80px}
+  .langbar{display:flex;justify-content:flex-end;gap:6px;margin-bottom:6px}
+  .langbar button{background:var(--panel2);border:1px solid var(--line);color:var(--mut);
+       border-radius:7px;padding:4px 10px;cursor:pointer;font-weight:700;font-size:12px}
+  .langbar button.on{background:var(--purple);border-color:var(--purple);color:#fff}
+  header{text-align:center;margin-bottom:22px}
+  h1{font-size:30px;margin:0 0 6px}
+  h1 .tw{color:var(--purple)}
+  .sub{color:var(--mut);margin:0}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px;margin:18px 0}
+  .dl{display:flex;gap:14px;align-items:center;flex-wrap:wrap;justify-content:center}
+  .btn{display:inline-block;background:var(--purple);color:#fff;text-decoration:none;
+       font-weight:700;padding:12px 20px;border-radius:9px;border:0;cursor:pointer}
+  .btn.sec{background:var(--panel2);border:1px solid var(--line)}
+  .detect{text-align:center;color:var(--mut);margin:10px 0 0;font-size:14px}
+  .detect b{color:var(--green)}
+  .tabs{display:flex;gap:8px;margin:22px 0 0;justify-content:center;flex-wrap:wrap}
+  .tab{padding:10px 18px;border-radius:9px;border:1px solid var(--line);
+       background:var(--panel2);color:var(--txt);cursor:pointer;font-weight:600}
+  .tab.active{background:var(--purple);border-color:var(--purple)}
+  ol{padding-left:22px} li{margin:10px 0}
+  code,.url{background:#000;border:1px solid var(--line);border-radius:6px;
+            padding:2px 8px;font:13px Consolas,monospace;color:#fff}
+  .copy{margin-left:8px;font-size:12px;padding:3px 8px;border-radius:6px;
+        border:1px solid var(--line);background:var(--panel2);color:var(--txt);cursor:pointer}
+  .note{background:#211a0a;border:1px solid #5a4a16;border-radius:9px;padding:12px 14px;
+        color:#f5e6b8;font-size:14px;margin-top:14px}
+  .muted{color:var(--mut);font-size:13px}
+  h2{font-size:19px;margin:0 0 4px}
+  kbd{background:var(--panel2);border:1px solid var(--line);border-bottom-width:2px;
+      border-radius:5px;padding:1px 6px;font:12px Consolas,monospace}
+  footer{text-align:center;color:var(--mut);font-size:13px;margin-top:30px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="langbar">
+    <button data-lang="en">EN</button>
+    <button data-lang="pt">PT-BR</button>
+  </div>
+
+  <header>
+    <h1>📺 <span class="tw">Twitch</span> Channel Keeper</h1>
+    <p class="sub" id="sub"></p>
+  </header>
+
+  <div class="card">
+    <div class="dl">
+      <a class="btn" id="download" href="twitch-keeper.zip" download></a>
+      <a class="btn sec" id="repo" href="#" target="_blank" rel="noopener"></a>
+    </div>
+    <p class="detect" id="detect"></p>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab" data-b="chrome">Chrome</button>
+    <button class="tab" data-b="edge">Edge</button>
+    <button class="tab" data-b="brave">Brave</button>
+  </div>
+
+  <div class="card">
+    <h2 id="howTitle"></h2>
+    <p class="muted" id="intro"></p>
+    <ol id="steps"></ol>
+    <div class="note" id="braveNote" hidden></div>
+    <div class="note" id="updatesNote"></div>
+  </div>
+
+  <div class="card">
+    <h2 id="liveTitle"></h2>
+    <p class="muted" id="liveBody"></p>
+  </div>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+  var NAMES = { chrome:"Chrome", edge:"Edge", brave:"Brave" };
+  var URLS  = { chrome:"chrome://extensions", edge:"edge://extensions", brave:"brave://extensions" };
+
+  var I18N = {
+    en: {
+      sub: 'Keeps one Twitch tab parked on the first <b>live</b> channel in your list — when it goes offline, it jumps to the next live one, circular.',
+      download: "⬇ Download extension (.zip)",
+      repo: "View source on GitHub",
+      detecting: "Detecting your browser…",
+      detected: function(n){ return "Looks like you're on <b>"+n+"</b> — showing those steps. Not right? Pick your browser above."; },
+      unsupported: "This extension needs a <b>Chromium</b> browser (Chrome, Edge, or Brave). Firefox needs a separate build.",
+      howTitle: function(n){ return "Install on "+n; },
+      intro: "These are <em>unpacked</em> install steps — the same flow on all three browsers, only the extensions URL differs.",
+      steps: function(b){ return [
+        'Download the <code>.zip</code> above and <b>unzip</b> it to a folder you\'ll keep (e.g. <code>Documents\\twitch-keeper</code>). Don\'t delete it later — the browser loads it from there.',
+        'Open your extensions page: <span class="url" id="exturl">'+URLS[b]+'</span> <button class="copy" id="copyurl">Copy</button><div class="muted">Paste it in the address bar and press <kbd>Enter</kbd> — browsers block links to internal pages.</div>',
+        'Turn on <b>Developer mode</b> (toggle, top-right).',
+        'Click <b>Load unpacked</b> and select the unzipped <code>twitch-keeper</code> folder (the one with <code>manifest.json</code>).',
+        'Pin it: click the <b>🧩 puzzle-piece</b> in the toolbar → pin <b>Twitch Channel Keeper</b>.',
+        'Click the icon, flip the <b>toggle ON</b>, edit your channel list (one per line, priority order), and hit <b>Save list</b>. Options there: <b>close other Twitch tabs</b> and <b>open the tab muted</b>.'
+      ]; },
+      braveNote: '<b>Brave tip:</b> Brave has no store of its own — it installs Chromium extensions exactly like this. If you see a one-time "keep developer-mode extensions" prompt, choose <b>Keep</b>.',
+      updatesNote: '<b>Audio & focus:</b> by default the stream plays <b>with sound</b>, and the tab opens <b>focused</b> (a background tab won\'t autostart playback). The optional "muted" setting mutes the <em>browser tab</em>, never the Twitch player.<br><br><b>Updates are manual:</b> re-download, replace the folder contents, then click ↻ reload on the extension card.',
+      liveTitle: "How it decides who's live",
+      liveBody: "It reads Twitch's public web API (the same one logged-out visitors use) — read-only, no login, no API key, no personal data collected. Your channel list is stored locally. It checks about once a minute (and instantly when you toggle it on).",
+      footer: "Not affiliated with Twitch. Personal-use helper."
+    },
+    pt: {
+      sub: 'Mantém uma aba da Twitch no primeiro canal <b>ao vivo</b> da sua lista — quando ele sai do ar, pula para o próximo ao vivo, em ciclo.',
+      download: "⬇ Baixar extensão (.zip)",
+      repo: "Ver código no GitHub",
+      detecting: "Detectando seu navegador…",
+      detected: function(n){ return "Parece que você está no <b>"+n+"</b> — mostrando esses passos. Não é? Escolha seu navegador acima."; },
+      unsupported: "Esta extensão precisa de um navegador <b>Chromium</b> (Chrome, Edge ou Brave). O Firefox precisa de uma versão separada.",
+      howTitle: function(n){ return "Instalar no "+n; },
+      intro: "Estes são os passos de instalação “sem compactação” — o mesmo processo nos três navegadores, só muda a URL de extensões.",
+      steps: function(b){ return [
+        'Baixe o <code>.zip</code> acima e <b>extraia</b> para uma pasta que você vai manter (ex.: <code>Documentos\\twitch-keeper</code>). Não apague depois — o navegador carrega a extensão de lá.',
+        'Abra a página de extensões: <span class="url" id="exturl">'+URLS[b]+'</span> <button class="copy" id="copyurl">Copiar</button><div class="muted">Cole na barra de endereço e tecle <kbd>Enter</kbd> — navegadores bloqueiam links para páginas internas.</div>',
+        'Ative o <b>Modo do desenvolvedor</b> (canto superior direito).',
+        'Clique em <b>Carregar sem compactação</b> (Load unpacked) e selecione a pasta <code>twitch-keeper</code> extraída (a que tem o <code>manifest.json</code>).',
+        'Fixe: clique na <b>🧩 peça de quebra-cabeça</b> na barra → fixar <b>Twitch Channel Keeper</b>.',
+        'Clique no ícone, ligue o <b>botão</b>, edite sua lista de canais (um por linha, por prioridade) e clique em <b>Salvar lista</b>. Opções ali: <b>fechar outras abas da Twitch</b> e <b>abrir a aba muda</b>.'
+      ]; },
+      braveNote: '<b>Dica Brave:</b> o Brave não tem loja própria — ele instala extensões Chromium exatamente assim. Se aparecer um aviso para "manter extensões do modo desenvolvedor", escolha <b>Manter</b>.',
+      updatesNote: '<b>Áudio e foco:</b> por padrão a transmissão toca <b>com som</b> e a aba abre <b>em foco</b> (uma aba em segundo plano não inicia a reprodução). A opção "muda" silencia a <em>aba do navegador</em>, nunca o player da Twitch.<br><br><b>Atualizações são manuais:</b> baixe de novo, substitua o conteúdo da pasta e clique em ↻ recarregar no card da extensão.',
+      liveTitle: "Como ele sabe quem está ao vivo",
+      liveBody: "Ele lê a API pública da web da Twitch (a mesma que visitantes deslogados usam) — somente leitura, sem login, sem chave de API, sem coletar dados pessoais. Sua lista fica salva localmente. Verifica cerca de uma vez por minuto (e na hora quando você liga).",
+      footer: "Sem afiliação com a Twitch. Utilitário de uso pessoal."
+    }
+  };
+
+  var LANG = "en", BROWSER = "chrome";
+
+  function repoLink(){
+    var m = location.hostname.match(/^([^.]+)\.github\.io$/);
+    var parts = location.pathname.split("/").filter(Boolean);
+    return (m && parts.length) ? "https://github.com/"+m[1]+"/"+parts[0] : "https://github.com/";
+  }
+
+  function render(){
+    var d = I18N[LANG];
+    document.documentElement.lang = (LANG === "pt") ? "pt-BR" : "en";
+    document.getElementById("sub").innerHTML = d.sub;
+    document.getElementById("download").textContent = d.download;
+    var r = document.getElementById("repo"); r.textContent = d.repo; r.href = repoLink();
+    document.getElementById("howTitle").textContent = d.howTitle(NAMES[BROWSER]);
+    document.getElementById("intro").innerHTML = d.intro;
+
+    var ol = document.getElementById("steps");
+    ol.innerHTML = d.steps(BROWSER).map(function(s){ return "<li>"+s+"</li>"; }).join("");
+
+    var bn = document.getElementById("braveNote");
+    bn.innerHTML = d.braveNote; bn.hidden = (BROWSER !== "brave");
+    document.getElementById("updatesNote").innerHTML = d.updatesNote;
+    document.getElementById("liveTitle").textContent = d.liveTitle;
+    document.getElementById("liveBody").textContent = d.liveBody;
+    document.getElementById("footer").textContent = d.footer;
+
+    // re-wire copy button (it's recreated each render)
+    var cp = document.getElementById("copyurl");
+    if (cp) cp.addEventListener("click", function(){
+      navigator.clipboard.writeText(URLS[BROWSER]).then(function(){
+        cp.textContent = (LANG==="pt"?"Copiado!":"Copied!");
+        setTimeout(function(){ cp.textContent = (LANG==="pt"?"Copiar":"Copy"); }, 1200);
+      });
+    });
+
+    document.querySelectorAll(".tab").forEach(function(t){ t.classList.toggle("active", t.dataset.b === BROWSER); });
+    document.querySelectorAll(".langbar button").forEach(function(b){ b.classList.toggle("on", b.dataset.lang === LANG); });
+  }
+
+  function setDetect(state, name){
+    var d = I18N[LANG], el = document.getElementById("detect");
+    if (state === "detecting") el.innerHTML = d.detecting;
+    else if (state === "unsupported") el.innerHTML = d.unsupported;
+    else el.innerHTML = d.detected(name);
+  }
+
+  // events
+  document.querySelectorAll(".tab").forEach(function(t){
+    t.addEventListener("click", function(){ BROWSER = t.dataset.b; render(); });
+  });
+  document.querySelectorAll(".langbar button").forEach(function(b){
+    b.addEventListener("click", function(){ LANG = b.dataset.lang; localStorage.setItem("tck_lang", LANG); render(); setDetect("done", NAMES[BROWSER]); });
+  });
+
+  async function detect(){
+    var ua = navigator.userAgent, b = "chrome";
+    if (/Edg\//.test(ua)) b = "edge";
+    else if (navigator.brave && await navigator.brave.isBrave().catch(function(){return false;})) b = "brave";
+    BROWSER = b;
+    var chromium = /Chrome\//.test(ua) || b === "brave";
+    render();
+    setDetect(chromium ? "done" : "unsupported", NAMES[b]);
+  }
+
+  // init language: saved -> browser pt -> en
+  LANG = localStorage.getItem("tck_lang") || (navigator.language && navigator.language.toLowerCase().indexOf("pt") === 0 ? "pt" : "en");
+  setDetect("detecting");
+  detect();
+</script>
+</body>
+</html>
